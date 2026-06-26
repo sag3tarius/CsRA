@@ -1,0 +1,26 @@
+From: Jabalah Al Ganem, Commander of Donovian Foreign Security Service (DFSS)
+To: Vlad [3ntity Lead]
+Subject: AUTHORIZATION: Operation Dam Breaker
+
+Vlad,
+
+The strategic window is open. Two weeks from today, Donovian fire will rain down on the arrogant American imperialists.The Presidential Intelligence Advisor has approved the final execution of Operation Dam Breaker.
+
+Our intelligence confirms that the Western United States' power grid remains over-reliant on the current output from the Hoover Dam. By severing this artery, we do more than cut power; we initiate a cascade of infrastructure failure that the Americans cannot contain.
+
+Your Objectives:
+Infiltration: Utilize the "3ntity" proprietary backdoor to bypass the facility's air-gapped ICS (Industrial Control Systems).
+
+Manipulation: Override the SCADA protocols to force a catastrophic synchronization failure in the turbine gallery.
+
+Destruction: Trigger the emergency spillway gates prematurely to ensure physical structural compromise.
+
+Operational Security:
+Ensure all digital signatures point toward domestic extremist fingerprints. Donovia must remain invisible until the lights go out.
+
+The 3ntity group is the primary tool for this objective. Execute the mission and ensure the digital trail is erased.
+
+Victory to Donovia.
+Jabalah Al Ganem
+Commander, Donovian Foreign Security Service (DFSS)
+
