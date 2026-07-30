@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Симуляция военного термостата (Цельсий)</title>
+<style>body{background-color:#1a1a1a;font-family:Consolas,monospace;color:#00ff99;text-align:center;padding:20px}.panel{border:3px solid #00ff99;padding:20px;width:480px;margin:auto;border-radius:8px;background-color:#0d0d0d}button{width:90px;margin:5px;padding:10px;font-size:16px;background-color:#003300;color:#00ff99;border:2px solid #00ff99;cursor:pointer}button.active{background-color:#00ff99;color:#000}#dialWrapper{margin-top:20px}#dial{width:180px}.labelText{fill:#00ff99;font-size:10px;font-weight:bold;font-family:Consolas,monospace}.readout{margin-top:20px;font-size:18px}
+</style>
+</head>
+<body>
+<div class="panel">
+<h2>МОДУЛЬ УПРАВЛЕНИЯ MIL-THERMO</h2>
+<h3>Моделируемый блок: Lumikko 150 кВт HVAC (Цельсий)</h3>
+<button id="onBtn" class="active">Вкл</button>
+<button id="offBtn">Выкл</button>
+<audio id="alarmSound" src="alarm.wav" preload="auto"></audio>
+<div id="dialWrapper">
+<svg id="dial" viewBox="0 0 140 140"><g transform="translate(20 20)"><circle cx="50" cy="50" r="45" stroke="#00ff99" stroke-width="4" fill="none"/>
+<g id="majorTicks"><line x1="50" y1="5" x2="50" y2="15" stroke="blue" stroke-width="3"/><line transform="rotate(30 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="blue" stroke-width="3"/><line transform="rotate(60 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="blue" stroke-width="3"/><line transform="rotate(90 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="blue" stroke-width="3"/><line transform="rotate(120 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="green" stroke-width="3"/><line transform="rotate(150 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="green" stroke-width="3"/><line transform="rotate(180 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="green" stroke-width="3"/><line transform="rotate(210 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="orange" stroke-width="3"/><line transform="rotate(240 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="orange" stroke-width="3"/><line transform="rotate(270 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="red" stroke-width="3"/><line transform="rotate(300 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="red" stroke-width="3"/><line transform="rotate(330 50 50)" x1="50" y1="5" x2="50" y2="15" stroke="red" stroke-width="3"/></g>
+<g class="labelText"><text transform="rotate(0 50 50) translate(0 -18)" x="50" y="10">-40</text><text transform="rotate(30 50 50) translate(0 -18)" x="50" y="10">-20</text><text transform="rotate(60 50 50) translate(0 -18)" x="50" y="10">-10</text><text transform="rotate(90 50 50) translate(0 -18)" x="50" y="10">0</text><text transform="rotate(120 50 50) translate(0 -18)" x="50" y="10">10</text><text transform="rotate(150 50 50) translate(0 -18)" x="50" y="10">20</text><text transform="rotate(180 50 50) translate(0 -18)" x="50" y="10">30</text><text transform="rotate(210 50 50) translate(0 -18)" x="50" y="10">40</text><text transform="rotate(240 50 50) translate(0 -18)" x="50" y="10">50</text><text transform="rotate(270 50 50) translate(0 -18)" x="50" y="10">60</text><text transform="rotate(300 50 50) translate(0 -18)" x="50" y="10">70</text><text transform="rotate(330 50 50) translate(0 -18)" x="50" y="10">80</text></g>
+<circle cx="50" cy="50" r="3" fill="#00ff99"/><line id="dialNeedle" x1="50" y1="50" x2="50" y2="10" stroke="#00ff99" stroke-width="3"/></g></svg></div>
+<br>
+<label>Целевая температура (°C):</label>
+<input type="range" id="targetTemp" min="-40" max="80" step="1" value="20">
+<div id="tempDisplay">20 °C</div>
+<div class="readout">
+<div id="currentMode">РЕЖИМ: ОТОПЛЕНИЕ (АВТО)</div>
+<div id="dayNightStatus">РЕЖИМ ВРЕМЕНИ: --</div>
+<div id="avgTempDisplay">СРЕДНЯЯ НАРУЖНАЯ ТЕМП.: --</div>
+<div id="internalTempDisplay">ВНУТРЕННЯЯ ТЕМП.: --</div>
+<div id="dutyDisplay">РАБОЧИЙ ЦИКЛ: --</div>
+<div id="etaDisplay">ОЖИДАЕМОЕ ВРЕМЯ ДО ЦЕЛИ: --</div>
+<div id="alarmDisplay">СИГНАЛ ТРЕВОГИ: НЕТ</div>
+</div>
+</div>
+<script>
+let mode="ON";let internalTemp=22;let alarmActive=false;let lastAlarmTime=0;
+const insulationFactor=6,heatRate=0.0035,coolRate=0.006,exchFactor=insulationFactor*400;
+const avgDay=[13.1,15.6,20.3,24.8,28.4,31.6,32.9,32.2,29.4,24.6,19.8,14.9];
+const avgNight=[0.2,1.5,5.7,9.4,14.1,18.3,20.3,19.9,16.8,10.1,5.4,1.6];
+const onBtn=document.getElementById("onBtn"),offBtn=document.getElementById("offBtn"),targetTempSlider=document.getElementById("targetTemp");
+const tempDisplay=document.getElementById("tempDisplay"),currentMode=document.getElementById("currentMode"),dayNightStatus=document.getElementById("dayNightStatus"),avgTempDisplay=document.getElementById("avgTempDisplay"),internalTempDisplay=document.getElementById("internalTempDisplay"),dutyDisplay=document.getElementById("dutyDisplay"),etaDisplay=document.getElementById("etaDisplay"),alarmDisplay=document.getElementById("alarmDisplay"),dialNeedle=document.getElementById("dialNeedle");
+function updateDial(t){dialNeedle.setAttribute("transform","rotate("+((t+40)*3)+" 50 50)")}
+updateDial(internalTemp);
+function setActive(btn){[onBtn,offBtn].forEach(b=>b.classList.remove("active"));btn.classList.add("active")}
+onBtn.onclick=()=>{mode="ON";setActive(onBtn)};
+offBtn.onclick=()=>{mode="OFF";setActive(offBtn)};
+targetTempSlider.oninput=()=>{tempDisplay.textContent=targetTempSlider.value+" °C"};
+function getDayOrNight(){let h=new Date().getHours();return(h>=6&&h<18)?"ДЕНЬ":"НОЧЬ"}
+function getCurrentExternalAvg(){let m=new Date().getMonth();return getDayOrNight()==="ДЕНЬ"?avgDay[m]:avgNight[m]}
+function simulateStep(){let extTemp=getCurrentExternalAvg(),target=Number(targetTempSlider.value);
+internalTemp+=(extTemp-internalTemp)/exchFactor;let hvacEffect=0;
+if(mode==="ON"){if(target>internalTemp){hvacEffect=(target-internalTemp)*heatRate;currentMode.textContent="РЕЖИМ: ОТОПЛЕНИЕ (АВТО)"}
+else if(target<internalTemp){hvacEffect=(target-internalTemp)*coolRate;currentMode.textContent="РЕЖИМ: ОХЛАЖДЕНИЕ (АВТО)"}
+else currentMode.textContent="РЕЖИМ: ОЖИДАНИЕ"}
+else currentMode.textContent="РЕЖИМ: ВЫКЛ";
+internalTemp+=hvacEffect;
+let diff=Math.abs(target-internalTemp);
+dutyDisplay.textContent="РАБОЧИЙ ЦИКЛ: "+((diff>1&&mode==="ON")?"АКТИВЕН":"ОЖИДАНИЕ");
+let eta="--",rate=Math.abs(hvacEffect);if(rate>0.001)eta=Math.round(Math.abs((target-internalTemp)/rate))+" мин";
+etaDisplay.textContent="ОЖИДАЕМОЕ ВРЕМЯ ДО ЦЕЛИ: "+eta;
+internalTempDisplay.textContent="ВНУТРЕННЯЯ ТЕМП.: "+internalTemp.toFixed(1)+" °C";
+dayNightStatus.textContent="РЕЖИМ ВРЕМЕНИ: "+getDayOrNight();
+avgTempDisplay.textContent="СРЕДНЯЯ НАРУЖНАЯ ТЕМП.: "+extTemp.toFixed(1)+" °C";
+let alarm="НЕТ";alarmDisplay.style.color="#00ff99";
+let alarmSound=document.getElementById("alarmSound"),now=Date.now();
+if(internalTemp>50){alarm="ПЕРЕГРЕВ!";alarmDisplay.style.color="red";
+if(!alarmActive){alarmSound.play();alarmActive=true;lastAlarmTime=now}
+else if(now-lastAlarmTime>=60000){alarmSound.play();lastAlarmTime=now}}
+else if(internalTemp<0){alarm="ПРЕДУПРЕЖДЕНИЕ: ОПАСНОСТЬ ЗАМЕРЗАНИЯ!";alarmDisplay.style.color="red";
+if(!alarmActive){alarmSound.play();alarmActive=true;lastAlarmTime=now}
+else if(now-lastAlarmTime>=60000){alarmSound.play();lastAlarmTime=now}}
+else{alarmActive=false;lastAlarmTime=0}
+alarmDisplay.textContent="СИГНАЛ ТРЕВОГИ: "+alarm;
+updateDial(internalTemp)}
+setInterval(simulateStep,1000);
+</script>
+</body>
+</html>
