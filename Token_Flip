@@ -1,0 +1,41 @@
+using System;
+using System.Threading;
+
+class Program
+{
+    static void Main()
+    {
+        Console.Clear();
+
+        Console.WriteLine("=====================================");
+        Console.WriteLine("      ДОНОВСКИЙ RSA-ТОКЕН");
+        Console.WriteLine("=====================================");
+        Console.WriteLine("");
+
+        while (true)
+        {
+            // Generate random 7-digit token
+            int token = new Random().Next(1000000, 9999999);
+
+            Console.Clear();
+            Console.WriteLine("=====================================");
+            Console.WriteLine("      ДОНОВСКИЙ RSA-ТОКЕН");
+            Console.WriteLine("=====================================");
+            Console.WriteLine("");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Текущий токен:");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(token);
+            Console.ResetColor();
+
+            Console.WriteLine("");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Следующее обновление через 30 секунд...");
+            Console.ResetColor();
+
+            Thread.Sleep(30000);
+        }
+    }
+}
