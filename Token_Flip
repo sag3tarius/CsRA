@@ -8,9 +8,7 @@ echo             RSA TOKEN
 echo =====================================
 echo.
 
-:: Generate a 7-digit token
-set /a token=%random% * 327 + %random%
-set /a token=token %% 9000000 + 1000000
+for /f %%A in (C:\TokenService\current_token.txt) do set token=%%A
 
 echo Current token:
 echo !token!
