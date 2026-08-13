@@ -1,54 +1,38 @@
-using System;
-using System.Threading;
-using System.Diagnostics;
+@echo off
+setlocal EnableDelayedExpansion
 
-class Program
-{
-    static void Main()
-    {
-        bool interactive = IsInteractive();
+:: Enable ANSI colors (Windows 10+)
+for /f "tokens=1,2 delims==" %%i in ('"echo;"') do >nul
 
-        if (interactive)
-        {
-            Console.Clear();
-            Console.WriteLine("=====================================");
-            Console.WriteLine("      ДОНОВСКИЙ RSA-ТОКЕН");
-            Console.WriteLine("=====================================");
-            Console.WriteLine("");
-        }
+:banner
+cls
+echo =====================================
+echo       ДОНОВСКИЙ RSA-ТОКЕН
+echo =====================================
+echo.
 
-        while (true)
-        {
-            int token = new Random().Next(1000000, 9999999);
+:loop
+:: Generate a 7-digit random number
+:: Batch cannot directly generate 7-digit random numbers, 
+:: so we combine two randoms and trim.
+set /a part1=%random% * 327
+set /a token=part1 %% 9000000 + 1000000
 
-            if (interactive)
-            {
-                Console.Clear();
-                Console.WriteLine("=====================================");
-                Console.WriteLine("      ДОНОВСКИЙ RSA-ТОКЕН");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("");
+cls
+echo =====================================
+echo       ДОНОВСКИЙ RSA-ТОКЕН
+echo =====================================
+echo.
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("Текущий токен:");
+:: Cyan text
+echo ^[[36mТекущий токен:^[[0m
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(token);
-                Console.ResetColor();
-                Console.WriteLine("");
+:: Green text
+echo ^[[32m!token!^[[0m
+echo.
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Следующее обновление через 30 секунд...");
-                Console.ResetColor();
-            }
+:: Yellow text
+echo ^[[33mСледующее обновление через 30 секунд...^[[0m
 
-            Thread.Sleep(30000);
-        }
-    }
-
-    static bool IsInteractive()
-    {
-        // Detect if program is running inside an interactive console
-        return Environment.UserInteractive;
-    }
-}
+timeout /t 30 >nul
+goto loop
