@@ -1,0 +1,35 @@
+
+Automated Passwordless SCP Setup Instructions
+--------------------------------------------
+
+1. Install OpenSSH Client on Windows (if not already installed).
+
+2. Generate an SSH key on Windows:
+   ssh-keygen -t rsa -b 4096
+   - Save at default location
+   - No passphrase (press Enter twice)
+
+3. Copy the public key to the Linux host:
+   scp C:\Users\USERNAME\.ssh\id_rsa.pub root@linuxbox:/root/
+
+4. Install the key on the Linux machine:
+   sudo mkdir -p /root/.ssh
+   sudo cat /root/id_rsa.pub >> /root/.ssh/authorized_keys
+   sudo chmod 600 /root/.ssh/authorized_keys
+   sudo chmod 700 /root/.ssh
+   sudo rm /root/id_rsa.pub
+
+5. Test passwordless login from Windows:
+   ssh root@linuxbox
+   - Should log in with no password
+
+6. Automate SCP in your Windows token service:
+   scp C:\TokenService\current_token.txt root@linuxbox:/root/current_token
+
+7. Recommended: Secure the Linux file so only root can read it:
+   sudo chmod 600 /root/current_token
+
+8. Optional: Restrict root SSH access only from Windows IP by modifying authorized_keys:
+   from="WINDOWS_IP_ADDRESS" ssh-rsa AAAA...
+
+This provides fully automated, secure, passwordless token transfer from Windows to Linux, storing the token only where root can access it.
