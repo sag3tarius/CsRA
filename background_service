@@ -1,0 +1,1 @@
+schtasks /create /tn TokenService /tr "C:\TokenService\token_service.bat" /sc onstart /rl highest
