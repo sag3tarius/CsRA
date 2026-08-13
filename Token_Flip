@@ -1,38 +1,21 @@
 @echo off
+chcp 65001 >nul
 setlocal EnableDelayedExpansion
 
-:: Enable ANSI colors (Windows 10+)
-for /f "tokens=1,2 delims==" %%i in ('"echo;"') do >nul
-
-:banner
-cls
-echo =====================================
-echo       ДОНОВСКИЙ RSA-ТОКЕН
-echo =====================================
-echo.
-
 :loop
-:: Generate a 7-digit random number
-:: Batch cannot directly generate 7-digit random numbers, 
-:: so we combine two randoms and trim.
-set /a part1=%random% * 327
-set /a token=part1 %% 9000000 + 1000000
-
 cls
 echo =====================================
 echo       ДОНОВСКИЙ RSA-ТОКЕН
 echo =====================================
 echo.
 
-:: Cyan text
-echo ^[[36mТекущий токен:^[[0m
+set /a token=%random% * 327 + %random%
+set /a token=token %% 9000000 + 1000000
 
-:: Green text
-echo ^[[32m!token!^[[0m
+echo Текущий токен:
+echo !token!
 echo.
-
-:: Yellow text
-echo ^[[33mСледующее обновление через 30 секунд...^[[0m
+echo Следующее обновление через 30 секунд...
 
 timeout /t 30 >nul
 goto loop
