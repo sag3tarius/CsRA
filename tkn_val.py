@@ -1,33 +1,48 @@
-from flask import Flask, request, jsonify
+#!/usr/bin/env python3
+import json
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-app = Flask(__name__)
+PASSWORD = "ДОНОВИЯ_ВЛАСТВУЕТ!"
 
-PASSWORD = "ДОНОВИЯ_ВЛАСТВУЕТ!"  # same as in your HTML
+class Handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        # Read the incoming JSON
+        length = int(self.headers.get('Content-Length'))
+        data = json.loads(self.rfile.read(length).decode())
 
-@app.route("/validate_login", methods=["POST"])
-def validate():
-    data = request.get_json()
+        user_password = data.get("password", "")
+        user_token = data.get("token", "")
 
-    user_password = data.get("password", "")
-    user_token = data.get("token", "")
+        # Check password
+        if user_password != PASSWORD:
+            self.respond({"success": False})
+            return
 
-    # Validate password
-    if user_password != PASSWORD:
-        return jsonify(success=False)
+        # Read the token from /bin/tkn
+        try:
+            with open("/bin/tkn", "r") as f:
+                correct_token = f.read().strip()
+        except:
+            self.respond({"success": False})
+            return
 
-    # Read root-only token file
-    try:
-        with open("/bin/tkn", "r") as f:
-            correct_token = f.read().strip()
-    except Exception as e:
-        return jsonify(success=False)
+        # Compare token
+        if user_token == correct_token:
+            self.respond({"success": True})
+        else:
+            self.respond({"success": False})
 
-    # Validate token
-    if user_token == correct_token:
-        return jsonify(success=True)
+    def respond(self, payload):
+        response = json.dumps(payload).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        self.wfile.write(response)
 
-    return jsonify(success=False)
-
+def run():
+    server = HTTPServer(("0.0.0.0", 8080), Handler)
+    server.serve_forever()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    run()
