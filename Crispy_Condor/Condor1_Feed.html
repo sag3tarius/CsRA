@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Camera 1 Live Feed</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+
+    video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        z-index: 1;
+    }
+
+    #liveBox {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 0, 0, 0.85);
+        padding: 10px 18px;
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        border-radius: 6px;
+        box-shadow: 0 0 12px red;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        z-index: 10;
+    }
+
+    #condorLabel {
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="liveBox">
+    <span id="condorLabel">Condor 1</span>
+    <span>В ЭФИРЕ •</span>
+    <span id="timestamp"></span>
+</div>
+
+<video id="condorVideo" autoplay muted playsinline loop>
+    <source id="videoSource" src="Camera_Online.mp4" type="video/mp4">;
+</video>
+
+<script>
+const FIRE_THRESHOLD_MS = 60000;
+
+let condorDestroyed = localStorage.getItem("condor1_destroyed") === "true";
+let videoDone = localStorage.getItem("condor1_video_done") === "true";
+let crispyPlaying = false;
+
+// Timestamp updater
+setInterval(() => {
+    const now = new Date();
+    document.getElementById("timestamp").innerText =
+        `${String(now.getHours()).padStart(2,'0')}:` +
+        `${String(now.getMinutes()).padStart(2,'0')}:` +
+        `${String(now.getSeconds()).padStart(2,'0')}`;
+}, 1000);
+
+// Crispy video end → permanent offline screen
+const videoElement = document.getElementById("condorVideo");
+videoElement.addEventListener("ended", () => {
+    if (condorDestroyed) {
+        crispyPlaying = false;
+        videoDone = true;
+        localStorage.setItem("condor1_video_done", "true");
+
+        videoElement.style.display = "none";
+
+        const label = document.getElementById("liveBox");
+        label.style.background = "rgba(255,0,0,0.85)";
+        label.style.boxShadow = "0 0 12px red";
+        label.innerHTML =
+            '<span id="condorLabel">Condor 1</span> ' +
+            '<span style="color:yellow;">OFFLINE</span>';
+
+        localStorage.setItem("camera1_status", "OFFLINE");
+    }
+});
+
+function checkOverheatVideoSwap() {
+
+    const vid = document.getElementById("condorVideo");
+    const src = document.getElementById("videoSource");
+
+    const hvacStatus = localStorage.getItem("condor1_status");
+    const hvacIsRed = hvacStatus && hvacStatus.includes("ПЕРЕГРЕВ!");
+    const hvacIsCyan = hvacStatus && hvacStatus.includes("ПРЕДУПРЕЖДЕНИЕ: ОПАСНОСТЬ ЗАМЕРЗАНИЯ!");
+
+    // Permanent offline if crispy finished
+    if (videoDone) {
+        vid.style.display = "none";
+        const label = document.getElementById("liveBox");
+        label.innerHTML =
+            '<span id="condorLabel">Condor 1</span> ' +
+            '<span style="color:yellow;">OFFLINE</span>';
+        localStorage.setItem("camera1_status", "OFFLINE");
+        return;
+    }
+
+    // NEVER trigger crispy on cyan
+    if (hvacIsCyan) {
+        return;
+    }
+
+    // If crispy already playing, do not override
+    if (crispyPlaying) {
+        return;
+    }
+
+    // Only RED HVAC triggers destruction timing
+    const startTime = localStorage.getItem("condor1_alert_start_time");
+
+    if (hvacIsRed && startTime) {
+        const elapsed = Date.now() - parseInt(startTime);
+
+        if (elapsed >= FIRE_THRESHOLD_MS) {
+            condorDestroyed = true;
+            localStorage.setItem("condor1_destroyed", "true");
+
+            src.src = "Crispy_Condor.mp4";
+            vid.removeAttribute("loop");
+            vid.load();
+            vid.play();
+
+            crispyPlaying = true;
+            return;
+        }
+    }
+
+    // Normal feed if not destroyed
+    if (!condorDestroyed) {
+        if (!src.src.includes("Camera_Online.mp4")) {
+            src.src = "Camera_Online.mp4";
+            vid.setAttribute("loop", "");
+            vid.load();
+            vid.play();
+        }
+    }
+}
+
+setInterval(checkOverheatVideoSwap, 1000);
+</script>
+
+</body>
+</html>

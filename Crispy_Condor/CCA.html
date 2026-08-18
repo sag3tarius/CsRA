@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+
+        background-image: url("CCA.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+
+        color: black;
+        text-align: center;
+        padding-top: 50px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>ВВЕДИТЕ ПАРОЛЬ</h2>
+<input id="pass" type="password" style="font-size:20px;">
+<br><br>
+<button onclick="checkPass()" style="font-size:20px;">ВХОД</button>
+
+<script>
+function checkPass() {
+    const correct = "#ДОНОВИЯ_ВЛАСТВУЕТ!";
+    const user = document.getElementById("pass").value;
+
+    if (user === correct) {
+        localStorage.setItem("auth", "granted");
+        window.location.href = "fixed_updated_Condor_ControlR2.html";
+    } else {
+        alert("НЕПРАВИЛЬНЫЙ ПАРОЛЬ");
+    }
+}
+</script>
+
+</body>
+</html>

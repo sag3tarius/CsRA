@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Condor Control Center</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #0a0a0a;
+		
+		/* Background image settings */
+		background-image: url("Donovian_Flag.png");
+		background-size: cover;        /* Fill entire screen */
+		background-repeat: no-repeat;  /* Prevent tiles */
+		background-position: center;   /* Center image */
+		background-attachment: fixed;  /* Stays fixed behind content */
+
+        color: white;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+
+    /* FIX LINK STYLING ON BUTTONS */
+    a {
+        all: unset;
+        cursor: pointer;
+    }
+
+
+    h1 {
+        margin: 20px 0;
+        text-align: center;
+        font-size: 36px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		height: auto;
+        height: 80vh;
+        gap: 20px;
+        padding: 20px;
+        box-sizing: border-box;
+        place-items: center;
+        margin: auto;
+    }
+
+    .unit-card {
+        background: rgba(0, 0, 0, 0.55);
+        border-radius: 16px;
+        border: 2px solid #00aaff;
+        box-shadow: 0 0 12px #0077aa;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        transition: 0.25s ease;
+    }
+
+    .unit-card:hover {
+        box-shadow: 0 0 24px #33ccff;
+    }
+
+    .unit-label {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .unit-image {
+        width: 150px;
+        height: auto;
+        display: block;
+        margin: 0;
+    }
+
+    .unit-flex {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+		.circular-button {
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+    
+			/* More transparent rubberized background */
+			background: radial-gradient(circle at 30% 30%, 
+				rgba(42, 42, 42, 0.45), 
+				rgba(18, 18, 18, 0.35) 70%
+			);
+
+			/* Slightly reduced border opacity */
+			border: 3px solid rgba(0, 170, 255, 0.65);
+
+			/* Softer transparency-aware glow */
+			box-shadow:
+				0 0 16px rgba(0, 170, 255, 0.35),
+				inset 0 0 10px rgba(0, 170, 255, 0.35),
+				inset 0 0 22px rgba(0,0,0,0.45),
+				0 8px 16px rgba(0,0,0,0.45);
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			color: rgba(230, 247, 255, 0.85);
+			font-size: 20px;
+			font-weight: bold;
+			letter-spacing: 1px;
+
+			cursor: pointer;
+			transition: 0.25s ease-in-out;
+		}
+
+
+		/* Hover: enhanced glow but still semi-transparent */
+		.circular-button:hover {
+			box-shadow:
+				0 0 22px rgba(51, 204, 255, 0.55),
+				inset 0 0 14px rgba(51, 204, 255, 0.4),
+				inset 0 0 26px rgba(0,0,0,0.55),
+				0 12px 20px rgba(0,0,0,0.55);
+
+			border-color: rgba(51, 204, 255, 0.75);
+		}
+
+
+		/* Pressed effect */
+		.circular-button:active {
+			transform: translateY(3px);
+			box-shadow:
+				0 0 10px rgba(0, 150, 220, 0.4),
+				inset 0 0 16px rgba(0, 150, 220, 0.55),
+				inset 0 0 20px rgba(0,0,0,0.75),
+				0 4px 10px rgba(0,0,0,0.7);
+		}
+
+    .unit-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .button-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .button-row button {
+        width: 100px;
+        height: 100px;
+    }
+
+    .button-row button:hover {
+        background-color: #0077ff;
+    }
+
+    .status-light-small {
+        width: 15px;
+        height: 15px;
+        background-color: lime;
+        border-radius: 50%;
+        margin-left: 10px;
+    }
+</style>
+</head>
+
+<body>
+<script>
+if (localStorage.getItem("auth") !== "granted") {
+    window.location.href = "CCA.html";
+}
+</script>
+<h1>Condor Control</h1>
+
+<button onclick="localStorage.clear(); location.reload();">
+    RESET ALL DATA
+</button>
+
+<!--   your hidden code goes here   -->
+<div class="grid">
+
+    <!-- Condor 1 -->
+    <div class="unit-card">
+        <div class="unit-label">Condor 1</div>
+
+        <div class="unit-flex">
+            <img src="BC1.png"></img>
+
+            <div class="unit-buttons">
+                <div class="button-row">
+					<a target="_blank" rel="noopener noreferrer" href="hvac1.html"><button class="circular-button">HVAC 1</button></a>
+                    <div class="status-light-small" id="condor1_light"></div>
+                </div>
+
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="Condor1_Feed.html"><button class="circular-button">CAM 1</button></a>
+                    <div class="status-light-small" id="camera1_light"></div>
+                </div>
+            </div>
+        </div>
+		<br>
+		<div id="condor1_temp_display" class="temp-text">Temp: --</div>
+		<br>
+		<div id="condor1_alert_duration" class="temp-text">ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: --</div>
+		<div id="condor1_alert_start" class="temp-text">С МОМЕНТА ТРЕВОГИ: --</div>
+
+		<br><div id="camera1_status_text" class="temp-text">СТАТУС КАМЕРЫ: --</div>
+
+    </div>
+
+    <!-- Condor 2 -->
+    <div class="unit-card">
+        <div class="unit-label">Condor 2</div>
+
+        <div class="unit-flex">
+            <img src="BC2.png"></img>
+
+            <div class="unit-buttons">
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="hvac2.html"><button class="circular-button">HVAC 2</button></a>
+                    <div class="status-light-small" id="condor2_light"></div>
+                </div>
+
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="Condor2_Feed.html"><button class="circular-button">CAM 2</button></a>
+                    <div class="status-light-small" id="camera2_light"></div>
+                </div>
+            </div>
+        </div>
+		<br>
+		<div id="condor2_temp_display" class="temp-text">Temp: --</div>
+		<br>
+		<div id="condor2_alert_duration" class="temp-text">ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: --</div>
+		<div id="condor2_alert_start" class="temp-text">С МОМЕНТА ТРЕВОГИ: --</div>
+
+		<br><div id="camera2_status_text" class="temp-text">СТАТУС КАМЕРЫ: --</div>
+		
+	</div>
+
+    <!-- Condor 3 -->
+    <div class="unit-card">
+        <div class="unit-label">Condor 3</div>
+
+        <div class="unit-flex">
+            <img src="BC3.png"></img>
+
+            <div class="unit-buttons">
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="hvac3.html"><button class="circular-button">HVAC 3</button></a>
+                    <div class="status-light-small" id="condor3_light"></div>
+                </div>
+
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="Condor3_Feed.html"><button class="circular-button">CAM 3</button></a>
+                    <div class="status-light-small" id="camera3_light"></div>
+                </div>
+            </div>
+        </div>
+		<br>
+		<div id="condor3_temp_display" class="temp-text">Temp: --</div>
+		<br>
+		<div id="condor3_alert_duration" class="temp-text">ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: --</div>
+		<div id="condor3_alert_start" class="temp-text">С МОМЕНТА ТРЕВОГИ: --</div>
+
+		<br><div id="camera3_status_text" class="temp-text">СТАТУС КАМЕРЫ: --</div>
+		
+	</div>
+
+    <!-- Condor 4 -->
+    <div class="unit-card">
+        <div class="unit-label">Condor 4</div>
+
+        <div class="unit-flex">
+            <img src="BC4.png"></img>
+
+            <div class="unit-buttons">
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="hvac4.html"><button class="circular-button">HVAC 4</button></a>
+                    <div class="status-light-small" id="condor4_light"></div>
+                </div>
+
+                <div class="button-row">
+                    <a target="_blank" rel="noopener noreferrer" href="Condor4_Feed.html"><button class="circular-button">CAM 4</button></a>
+                    <div class="status-light-small" id="camera4_light"></div>
+                </div>
+            </div>
+        </div>
+		<br>
+		<div id="condor4_temp_display" class="temp-text">Temp: --</div>
+		<br>
+		<div id="condor4_alert_duration" class="temp-text">ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: --</div>
+		<div id="condor4_alert_start" class="temp-text">С МОМЕНТА ТРЕВОГИ: --</div>
+
+		<br><div id="camera4_status_text" class="temp-text">СТАТУС КАМЕРЫ: --</div>
+
+</div>
+
+<script>
+function updateTemperatures() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+        const temp = localStorage.getItem(`condor${u}_temp`);
+        const tempBox = document.getElementById(`condor${u}_temp_display`);
+        const hvacLight = document.getElementById(`condor${u}_light`);
+
+        if (!tempBox) return;
+
+        if (temp) {
+            tempBox.innerText = `${temp}`;
+
+            // Strip non-numbers
+            const tempValue = parseFloat(temp.replace(/[^\d.-]/g, ""));
+
+            // HVAC light actual rendered color
+            const hvacColor = getComputedStyle(hvacLight).backgroundColor;
+            const hvacIsRed = (hvacColor === "rgb(255, 0, 0)");
+            const tempIsHigh = (!isNaN(tempValue) && tempValue > 50.0);
+
+            // Three-way temperature status
+            if (hvacIsRed || tempIsHigh) {
+                tempBox.style.color = "red";      // overheat or hvac fault
+            } 
+            else if (!isNaN(tempValue) && tempValue < 0.0) {
+                tempBox.style.color = "cyan";     // NEW: below freezing
+				hvacLight.style.backgroundColor = "cyan";
+            } 
+            else {
+                tempBox.style.color = "white";    // normal
+            }
+        } else {
+            tempBox.innerText = "Awaiting Synch...";
+            tempBox.style.color = "white";
+        }
+    });
+}
+function updateStatusLights() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+        const status = localStorage.getItem(`condor${u}_status`);
+        const temp = localStorage.getItem(`condor${u}_temp`);
+
+        const light = document.getElementById(`condor${u}_light`);
+
+        if (light) {
+            if (status && status.includes("НЕТ")) {
+                light.style.backgroundColor = "lime";
+            } else if (status && status.includes("ПЕРЕГРЕВ!")){
+                light.style.backgroundColor = "red";
+            }
+			else if (status && status.includes("ПРЕДУПРЕЖДЕНИЕ: ОПАСНОСТЬ ЗАМЕРЗАНИЯ!")){
+                light.style.backgroundColor = "cyan";
+            }
+        }
+    });
+}
+function updateCameraStatusText() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+        const light = document.getElementById(`camera${u}_light`);
+        const textBox = document.getElementById(`camera${u}_status_text`);
+
+        if (!light || !textBox) return;
+
+        // READ ACTUAL CSS COLOR
+        const color = getComputedStyle(light).backgroundColor;
+
+        if (color === "rgb(0, 255, 0)") {   // green
+            textBox.innerText = "СТАТУС КАМЕРЫ: ОНЛАЙН";
+            textBox.style.color = "lime";
+
+        } else if (color === "rgb(255, 0, 0)") { // red
+            textBox.innerText = "СТАТУС КАМЕРЫ: ОФФЛАЙН";
+            textBox.style.color = "red";
+
+        } else {
+            textBox.innerText = "СТАТУС КАМЕРЫ: НЕИЗВЕСТНО";
+            textBox.style.color = "yellow";
+        }
+    });
+}
+function updateAlertTimers() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+
+        const tempBox = document.getElementById(`condor${u}_temp_display`);
+        const durationBox = document.getElementById(`condor${u}_alert_duration`);
+        const startBox = document.getElementById(`condor${u}_alert_start`);
+        const hvacLight = document.getElementById(`condor${u}_light`);
+        const alertKey = `condor${u}_alert_start_time`;
+
+        if (!tempBox || !durationBox || !startBox || !hvacLight) return;
+
+        // Read HVAC light actual rendered color
+        const hvacColor = getComputedStyle(hvacLight).backgroundColor;
+
+        // Alert types based on HVAC LIGHT ONLY
+        const isRedAlert = (hvacColor === "rgb(255, 0, 0)");
+        const isCyanAlert = (hvacColor === "rgb(0, 255, 255)");
+
+        // Sync temp reading color with HVAC alert state
+        if (isRedAlert) {
+            tempBox.style.color = "red";
+        } 
+        else if (isCyanAlert) {
+            tempBox.style.color = "cyan";
+        }
+
+        // Alert active?
+        if (isRedAlert || isCyanAlert) {
+
+            let startTime = localStorage.getItem(alertKey);
+
+            if (!startTime) {
+                startTime = Date.now();
+                localStorage.setItem(alertKey, startTime);
+            }
+
+            const startDate = new Date(parseInt(startTime));
+            const hh = String(startDate.getHours()).padStart(2, '0');
+            const mm = String(startDate.getMinutes()).padStart(2, '0');
+            const ss = String(startDate.getSeconds()).padStart(2, '0');
+
+            startBox.innerText = `С МОМЕНТА ТРЕВОГИ: ${hh}:${mm}:${ss}`;
+
+            const elapsedMs = Date.now() - parseInt(startTime);
+            const elapsedSec = Math.floor(elapsedMs / 1000);
+            const hrs = Math.floor(elapsedSec / 3600);
+            const mins = Math.floor((elapsedSec % 3600) / 60);
+            const secs = elapsedSec % 60;
+
+            durationBox.innerText =
+                `ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: ${hrs}h ${mins}m ${secs}s`;
+
+            // Alert text color matches HVAC
+            const alertColor = isRedAlert ? "red" : "cyan";
+            durationBox.style.color = alertColor;
+            startBox.style.color = alertColor;
+
+        } else {
+            // No alert
+            localStorage.removeItem(alertKey);
+            durationBox.innerText = "ДЛИТЕЛЬНОСТЬ ТРЕВОГИ: --";
+            durationBox.style.color = "white";
+
+            startBox.innerText = "С МОМЕНТА ТРЕВОГИ: --";
+            startBox.style.color = "white";
+
+            // Normal temp text color
+            tempBox.style.color = "white";
+        }
+    });
+}
+function updateCondorImages() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+        const img = document.querySelector(`img[src*="BC${u}"]`) || 
+                    document.querySelector(`#condor${u}_img`);
+
+        if (!img) return;
+
+        const hvacLight = document.getElementById(`condor${u}_light`);
+        const hvacColor = getComputedStyle(hvacLight).backgroundColor;
+
+        const cameraStatus = localStorage.getItem(`camera${u}_status`);
+
+        // Camera offline takes priority over HVAC state
+        if (cameraStatus === "OFFLINE") {
+            img.src = `Dead_Condor.png`;
+            return;
+        }
+
+        const isRed = hvacColor === "rgb(255, 0, 0)";
+        const isCyan = hvacColor === "rgb(0, 255, 255)";
+        const isGreen = hvacColor === "rgb(0, 255, 0)";
+
+        if (isRed) {
+            img.src = `BC${u}_Burn.png`;
+        } 
+        else if (isCyan) {
+            img.src = `BC${u}_Freeze.png`;
+        } 
+        else {
+            img.src = `BC${u}.png`;
+        }
+    });
+}
+function checkForAlertsAndPlaySound() {
+    const units = [1, 2, 3, 4];
+    const alertSound = document.getElementById("alertSound");
+
+    let anyAlert = false;
+
+    units.forEach(u => {
+        const hvacLight = document.getElementById(`condor${u}_light`);
+        if (!hvacLight) return;
+
+        const hvacColor = getComputedStyle(hvacLight).backgroundColor;
+
+        const isGreen = (hvacColor === "rgb(0, 255, 0)");
+
+        if (!isGreen) {
+            anyAlert = true;
+        }
+    });
+
+    const now = Date.now();
+
+    if (anyAlert) {
+        // Only play once every 3 seconds
+        if (now - lastAlarmTime >= 3000) {
+            alertSound.currentTime = 0;  // restart sound
+            alertSound.play();
+            lastAlarmTime = now;
+        }
+    } else {
+        // Reset timer and stop sound when normal
+        lastAlarmTime = 0;
+        alertSound.pause();
+        alertSound.currentTime = 0;
+    }
+}
+function syncCameraLights() {
+    const units = [1, 2, 3, 4];
+
+    units.forEach(u => {
+        const status = localStorage.getItem(`camera${u}_status`);
+        const light = document.getElementById(`camera${u}_light`);
+
+        if (!light) return;
+
+        if (status === "OFFLINE") {
+            light.style.backgroundColor = "red";
+        } else if (status === "ONLINE") {
+            light.style.backgroundColor = "lime";
+        }
+    });
+}
+setInterval(() => {
+    updateStatusLights();
+    updateTemperatures();
+	updateCameraStatusText();
+	updateAlertTimers();
+	updateCondorImages();
+	checkForAlertsAndPlaySound();
+	syncCameraLights();
+}, 1000);
+</script>
+<audio id="alertSound" src="alarm.wav" preload="auto">;</audio>
+</body>
+</html>
