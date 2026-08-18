@@ -1,0 +1,8 @@
+Create a place for local fonts:
+sudo mkdir -p /usr/share/fonts/truetype/custom
+
+Copy the font:
+sudo cp ~/fonts/*.ttf /usr/share/fonts/truetype/custom/
+
+Update the font cache:
+sudo fc-cache -f -v
