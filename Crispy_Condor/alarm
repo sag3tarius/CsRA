@@ -1,0 +1,25 @@
+import numpy as np
+from scipy.io.wavfile import write
+
+# === Alarm Parameters ===
+sample_rate = 44100        # CD-quality audio
+frequency = 1200           # 1.2 kHz harsh industrial tone
+beep_duration = 0.25       # length of each beep in seconds
+silence_duration = 0.15    # gap between beeps
+repeat_count = 6           # number of beeps in the alarm
+
+# === Generate beep ===
+t_beep = np.linspace(0, beep_duration, int(sample_rate * beep_duration), False)
+beep_wave = 0.9 * np.sin(2 * np.pi * frequency * t_beep)
+
+# === Generate silence ===
+silence_wave = np.zeros(int(sample_rate * silence_duration))
+
+# === Combine into repeated pattern ===
+alarm_wave = np.concatenate([(np.concatenate((beep_wave, silence_wave))) for _ in range(repeat_count)])
+
+# === Convert to 16-bit audio and save ===
+alarm_wave_int16 = np.int16(alarm_wave * 32767)
+write("industrial_alert.wav", sample_rate, alarm_wave_int16)
+
+print("Alarm sound generated: industrial_alert.wav")
