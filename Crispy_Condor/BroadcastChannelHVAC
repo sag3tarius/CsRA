@@ -1,0 +1,33 @@
+You will insert the BroadcastChannel at the very top of this script, like this:
+
+<script>
+const bc = new BroadcastChannel("condor");   // <-- ADD THIS LINE
+
+let mode="ON";
+let internalTemp=22;
+let alarmActive=false;
+...
+Then find the second script at the very bottom:
+This script currently does:
+
+setInterval(function() {
+    var alarm = document.getElementById('alarmDisplay').textContent.trim();
+    var temp = document.getElementById('internalTempDisplay').textContent.trim();
+    localStorage.setItem('condor1_status', alarm);
+    localStorage.setItem('condor1_temp', temp);
+}, 200);
+[hvac1 | HTML]
+
+Replace the entire content of that function with:
+
+setInterval(function() {
+    var alarm = document.getElementById('alarmDisplay').textContent.trim();
+    var temp = document.getElementById('internalTempDisplay').textContent.trim();
+
+    // Broadcast to dashboard instead of localStorage
+    bc.postMessage({
+        unit: 1,
+        temp: temp,
+        status: alarm
+    });
+}, 200);
