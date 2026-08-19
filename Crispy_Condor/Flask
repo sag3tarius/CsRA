@@ -1,0 +1,64 @@
+STEP 1 — Prepare a Download Folder on Ubuntu
+On your Ubuntu machine with internet:
+mkdir flask_offline
+cd flask_offline
+
+This keeps everything clean and easy to transfer.
+
+STEP 2 — Download Flask and All Dependencies (No Install Yet)
+Run this:
+pip3 download flask
+
+This will download:
+
+Flask
+Werkzeug
+Jinja2
+Click
+itsdangerous
+
+All as *.whl (wheel) files.
+If you want to confirm:
+ls
+
+You should see something like:
+Flask-2.2.5-py3-none-any.whl
+Werkzeug-2.2.3-py3-none-any.whl
+Jinja2-3.1.2-py3-none-any.whl
+Click-8.1.3-py3-none-any.whl
+itsdangerous-2.1.2-py3-none-any.whl
+
+These files represent "offline Flask."
+
+STEP 3 — Transfer Files to the Debian Host
+Copy the flask_offline folder to your Debian machine using:
+
+USB
+SCP
+rsync
+shared folder
+whatever your environment allows
+
+For example, using SCP from Ubuntu:
+scp -r flask_offline youruser@<debian-ip>:/home/youruser/
+
+Or manually via USB.
+
+STEP 4 — Install Flask Offline on Debian
+On the Debian machine:
+cd ~/flask_offline
+pip3 install *.whl
+
+If your Debian system requires sudo:
+sudo pip3 install *.whl
+
+This installs Flask without needing internet.
+
+STEP 5 — Verify the Installation
+Run:
+python3 -c "import flask; print('Flask installed successfully')"
+
+If you see:
+Flask installed successfully
+
+then you're ready to run the HVAC server.
