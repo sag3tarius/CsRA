@@ -1,0 +1,55 @@
+STEP 1 — On your Ubuntu machine: Download the Firefox Offline Installer
+You need the Windows 10, 64‑bit, Firefox ESR Offline Installer (.exe) because ESR is the best choice for stable offline environments and works perfectly with your HTML/JS architecture.
+
+On Ubuntu, run:
+
+wget https://download.mozilla.org/?product=firefox-esr-latest&os=win64&lang=en-US -O firefox_esr_win64.exe
+This command:
+
+Downloads the English 64‑bit ESR offline installer for Windows
+Saves it as firefox_esr_win64.exe
+Requires NO browser on Ubuntu
+Requires ONLY basic internet
+✔️ STEP 2 — Transfer the Installer to the Windows 10 machine
+You have several options depending on your environment:
+
+Option A — USB Flash Drive
+Copy from Ubuntu:
+
+cp firefox_esr_win64.exe /media/$USER/YOUR_USB/
+Then plug into Windows and copy the installer.
+
+Option B — SCP over LAN
+If your Windows box runs OpenSSH server (optional), from Ubuntu:
+
+scp firefox_esr_win64.exe username@windows-ip:/Users/username/Downloads/
+Option C — Shared Folder
+Mount the shared folder on Ubuntu and copy the file.
+
+Use whichever method your environment permits.
+
+✔️ STEP 3 — Install Firefox ESR on Windows 10
+On the Windows machine:
+
+Double‑click firefox_esr_win64.exe
+Choose:
+Standard Installation or Custom
+Ignore any internet‑related sync options
+Finish installation
+Firefox ESR does not require internet after installation.
+
+✔️ STEP 4 — Disable Auto Updates (important for offline environments)
+Open Firefox ESR on Windows:
+
+Click Menu (≡)
+Select Settings
+Scroll to Firefox Updates
+Select: “Check for updates but let you choose to install them” OR “Never check for updates” (offline environments)
+This ensures Firefox stays stable and does not request internet.
+
+✔️ STEP 5 — Set Firefox as Default Browser (optional)
+Go to:
+
+Windows Settings → Apps → Default Apps → Web Browser → Firefox
+
+This makes sure your dashboard opens in Firefox.
