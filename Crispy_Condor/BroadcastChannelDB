@@ -1,0 +1,40 @@
+Where to put it in Dashboard (fixed_updated_Condor_ControlR2.html)
+Find the <script> section near the bottom — the one that handles:
+
+updateStatusLights()
+updateTemperatures()
+updateAlertTimers()
+updateCondorImages()
+etc. [fixed_upda..._ControlR2 | HTML]
+Inside that same <script>, add the BroadcastChannel right at the top, like this:
+
+<script>
+const bc = new BroadcastChannel("condor");   // <-- ADD THIS LINE
+
+function updateTemperatures() {
+    ...
+}
+...
+</script>
+Then add the message listener
+Right below the const bc = ... line:
+
+bc.onmessage = (event) => {
+    const data = event.data;
+
+    // Store latest values in RAM instead of localStorage
+    window[`condor${data.unit}_temp`] = data.temp;
+    window[`condor${data.unit}_status`] = data.status;
+};
+✔ Final dashboard change:
+Find all dashboard places that do:
+
+localStorage.getItem(`condor${u}_temp`);
+localStorage.getItem(`condor${u}_status`);
+[fixed_upda..._ControlR2 | HTML]
+
+Replace them with:
+
+window[`condor${u}_temp`]
+window[`condor${u}_status`]
+This is the ONLY change your dashboard needs.
