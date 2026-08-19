@@ -3,7 +3,7 @@ You need the Windows 10, 64‑bit, Firefox ESR Offline Installer (.exe) because 
 
 On Ubuntu, run:
 
-wget https://download.mozilla.org/?product=firefox-esr-latest&os=win64&lang=en-US -O firefox_win64.exe
+wget https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US -O firefox_win64.exe
 This command:
 
 Downloads the English 64‑bit ESR offline installer for Windows
