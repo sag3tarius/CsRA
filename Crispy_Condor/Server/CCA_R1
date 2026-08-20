@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+
+        background-image: url("CCA.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+
+        color: black;
+        text-align: center;
+        padding-top: 50px;
+    }
+
+    input {
+        font-size: 20px;
+        padding: 8px;
+        width: 250px;
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>ВВЕДИТЕ ПАРОЛЬ И ТОКЕН</h2>
+
+<!-- PASSWORD -->
+<input id="pass" type="password" placeholder="Пароль"><br><br>
+
+<!-- TOKEN -->
+<input id="token" type="text" maxlength="7" placeholder="7-значный токен"><br><br>
+
+<button onclick="checkLogin()" style="font-size:20px;">ВХОД</button>
+
+<script>
+async function checkLogin() {
+    const correctPassword = "#ДОНОВИЯ_ВЛАСТВУЕТ!";
+    const userPassword = document.getElementById("pass").value;
+    const userToken = document.getElementById("token").value.trim();
+
+    if (!userPassword || !userToken) {
+        alert("Введите пароль и токен.");
+        return;
+    }
+
+    let tokenFromFile;
+
+    try {
+        const response = await fetch("tkn", { cache: "no-store" });
+        if (!response.ok) {
+            alert("Ошибка получения токена с сервера.");
+            return;
+        }
+
+        tokenFromFile = (await response.text()).trim();
+
+    } catch (err) {
+        alert("Не удаётся получить токен. Сервер недоступен.");
+        return;
+    }
+
+    const passwordIsCorrect = (userPassword === correctPassword);
+    const tokenIsCorrect = (userToken === tokenFromFile);
+
+    if (passwordIsCorrect && tokenIsCorrect) {
+        localStorage.setItem("auth", "granted");
+        window.location.href = "index.html";
+    } else {
+        alert("Пароль или токен неверные.");
+    }
+}
+</script>
+
+</body>
+</html>
